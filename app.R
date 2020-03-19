@@ -19,7 +19,7 @@ df <- as.data.frame(coronavirus)
 # Define UI for application that draws a histogram
 ui <- fluidPage(
     # Application title
-    titlePanel(h1("COVID-19 Monitor Northeastern University")),
+    titlePanel("COVID-19 Monitor Northeastern University"),
     
     # primary layout 
     sidebarLayout(
@@ -155,7 +155,7 @@ server <- function(input, output) {
             geom_point(data = df %>% filter(type == "confirmed"), 
                        aes(x = Long, y = Lat, size = cases), color = "red", alpha = 0.3) + 
             theme_void() + 
-            coord_map()
+            theme(legend.position = "bottom")
     )
     
     output$active <- renderPlot(
@@ -163,8 +163,7 @@ server <- function(input, output) {
             geom_polygon(data = map_data("world"), 
                          aes(x = long, y = lat, group = group), 
                          fill = "grey", alpha = 0.5) +  
-            theme_void() + 
-            coord_map()
+            theme_void()
     )
 }
 

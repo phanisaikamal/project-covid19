@@ -18,7 +18,6 @@ df <- as.data.frame(coronavirus)
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
-
     # Application title
     titlePanel(h1("COVID-19 Monitor Northeastern University")),
     
@@ -90,6 +89,7 @@ ui <- fluidPage(
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
+    
     output$totalConfirmed <- renderText(
         paste("Total Confimed: ", 
                   df %>% 

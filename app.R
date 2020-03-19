@@ -155,7 +155,8 @@ server <- function(input, output) {
             geom_point(data = df %>% filter(type == "confirmed"), 
                        aes(x = Long, y = Lat, size = cases), color = "red", alpha = 0.3) + 
             theme_void() + 
-            theme(legend.position = "bottom")
+            theme(legend.position = "bottom") + 
+            coord_cartesian(ylim = c(-60, 80)) 
     )
     
     output$active <- renderPlot(

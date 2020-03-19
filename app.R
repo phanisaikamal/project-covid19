@@ -20,13 +20,13 @@ df <- as.data.frame(coronavirus)
 ui <- fluidPage(
 
     # Application title
-    titlePanel("COVID-19 Monitor Northeastern University"),
+    titlePanel(h1("COVID-19 Monitor Northeastern University")),
     
     # primary layout 
     sidebarLayout(
         sidebarPanel(
             verticalLayout(
-                textOutput("totalConfirmed"), 
+                h3(textOutput("totalConfirmed")), 
                 dataTableOutput("confirmed")
             ), 
             width = 3
@@ -36,12 +36,12 @@ ui <- fluidPage(
                 sidebarPanel(
                     verticalLayout(
                         verticalLayout(
-                            textOutput("totalDeaths"), 
+                            h3(textOutput("totalDeaths")), 
                             dataTableOutput("deaths"), 
                             fluid = TRUE
                         ), 
                         verticalLayout(
-                            textOutput("totalRecovered"), 
+                            h3(textOutput("totalRecovered")), 
                             dataTableOutput("recovered"), 
                             fluid = TRUE
                         ),
@@ -106,7 +106,7 @@ server <- function(input, output) {
             arrange(-Total), 
         rownames = FALSE, 
         extensions = c("Scroller"), 
-        options = list(scroller = TRUE, scrollY = 500, searching = FALSE)
+        options = list(info = FALSE, scroller = TRUE, scrollY = 500, searching = FALSE)
     ) 
     
     output$totalDeaths <- renderText(
@@ -125,7 +125,7 @@ server <- function(input, output) {
             arrange(-Total), 
         rownames = FALSE, 
         extensions = c("Scroller"), 
-        options = list(scroller = TRUE, scrollY = 200, searching = FALSE)
+        options = list(info = FALSE, scroller = TRUE, scrollY = 200, searching = FALSE)
     )
     
     output$totalRecovered <- renderText(
@@ -144,7 +144,7 @@ server <- function(input, output) {
             arrange(-Total), 
         rownames = FALSE, 
         extensions = c("Scroller"), 
-        options = list(scroller = TRUE, scrollY = 200, searching = FALSE)
+        options = list(info = FALSE, scroller = TRUE, scrollY = 200, searching = FALSE)
     )
     
     output$cumulativeConfirmed <- renderPlot(
@@ -162,7 +162,7 @@ server <- function(input, output) {
         ggplot() + 
             geom_polygon(data = map_data("world"), 
                          aes(x = long, y = lat, group = group), 
-                         fill = "grey", alpha = 0.5) + 
+                         fill = "grey", alpha = 0.5) +  
             theme_void() + 
             coord_map()
     )

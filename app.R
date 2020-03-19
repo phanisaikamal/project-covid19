@@ -9,41 +9,163 @@
 
 library(shiny)
 library(tidyverse)
+library(coronavirus)
+library(DT)
+library(maps)
+library(mapproj)
+
+df <- as.data.frame(coronavirus)
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
 
     # Application title
-    titlePanel("Old Faithful Geyser Data"),
-
-    # Sidebar with a slider input for number of bins 
+    titlePanel("COVID-19 Monitor Northeastern University"),
+    
+    # primary layout 
     sidebarLayout(
         sidebarPanel(
-            sliderInput("bins",
-                        "Number of bins:",
-                        min = 1,
-                        max = 50,
-                        value = 30)
+            verticalLayout(
+                textOutput("totalConfirmed"), 
+                dataTableOutput("confirmed")
+            ), 
+            width = 3
         ),
-
-        # Show a plot of the generated distribution
         mainPanel(
-           plotOutput("distPlot")
-        )
+            sidebarLayout(
+                sidebarPanel(
+                    verticalLayout(
+                        verticalLayout(
+                            textOutput("totalDeaths"), 
+                            dataTableOutput("deaths"), 
+                            fluid = TRUE
+                        ), 
+                        verticalLayout(
+                            textOutput("totalRecovered"), 
+                            dataTableOutput("recovered"), 
+                            fluid = TRUE
+                        ),
+                        fluid = TRUE
+                    ), 
+                    width = 4
+                ),
+                mainPanel(
+                    tabsetPanel(
+                        tabPanel(
+                            "Global Spread Map", 
+                            tabsetPanel(
+                                tabPanel(
+                                    "Cumulative Confirmed Cases", 
+                                    plotOutput("cumulativeConfirmed")
+                                ),
+                                tabPanel(
+                                    "Active Cases", 
+                                    plotOutput("active")
+                                )
+                            )
+                        ),
+                        tabPanel(
+                            "Growth Charts", 
+                            tabsetPanel(
+                                tabPanel(
+                                    "Actual Growth", 
+                                    plotOutput("actualGrowth")
+                                ),
+                                tabPanel(
+                                    "Forecasted Growth", 
+                                    plotOutput("forecastGrowth")
+                                )
+                            )
+                        )
+                    ), 
+                    width = 8
+                ),
+                position = c("right")
+            ), 
+            width = 9
+        ),
+        position = c("left", "right")
     )
 )
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
-
-    output$distPlot <- renderPlot({
-        # generate bins based on input$bins from ui.R
-        x    <- faithful[, 2]
-        bins <- seq(min(x), max(x), length.out = input$bins + 1)
-
-        # draw the histogram with the specified number of bins
-        hist(x, breaks = bins, col = 'darkgray', border = 'white')
-    })
+    output$totalConfirmed <- renderText(
+        paste("Total Confimed: ", 
+                  df %>% 
+                      filter(type == "confirmed") %>% 
+                      summarise(sum(cases))
+        )
+    ) 
+    
+    output$confirmed <- DT::renderDataTable(
+        df %>% 
+            filter(type == "confirmed") %>% 
+            group_by(Country = Country.Region) %>% 
+            summarise(Total = sum(cases)) %>% 
+            arrange(-Total), 
+        rownames = FALSE, 
+        extensions = c("Scroller"), 
+        options = list(scroller = TRUE, scrollY = 500, searching = FALSE)
+    ) 
+    
+    output$totalDeaths <- renderText(
+        paste("Total Deaths: ", 
+              df %>% 
+                  filter(type == "death") %>% 
+                  summarise(sum(cases))
+        )
+    )
+    
+    output$deaths <- DT::renderDataTable(
+        df %>% 
+            filter(type == "death") %>% 
+            group_by(Country = Country.Region) %>% 
+            summarise(Total = sum(cases)) %>% 
+            arrange(-Total), 
+        rownames = FALSE, 
+        extensions = c("Scroller"), 
+        options = list(scroller = TRUE, scrollY = 200, searching = FALSE)
+    )
+    
+    output$totalRecovered <- renderText(
+        paste("Total Recovered: ", 
+              df %>% 
+                  filter(type == "recovered") %>% 
+                  summarise(sum(cases))
+        )
+    )
+    
+    output$recovered <- DT::renderDataTable(
+        df %>% 
+            filter(type == "recovered") %>% 
+            group_by(Country = Country.Region) %>% 
+            summarise(Total = sum(cases)) %>% 
+            arrange(-Total), 
+        rownames = FALSE, 
+        extensions = c("Scroller"), 
+        options = list(scroller = TRUE, scrollY = 200, searching = FALSE)
+    )
+    
+    output$cumulativeConfirmed <- renderPlot(
+        ggplot() + 
+            geom_polygon(data = map_data("world"), 
+                         aes(x = long, y = lat, group = group), 
+                         fill = "grey", alpha = 0.5) + 
+            geom_point(data = df %>% filter(type == "confirmed"), 
+                       aes(x = Long, y = Lat, size = cases), color = "red", alpha = 0.3) + 
+            theme_void() + 
+            coord_map()
+    )
+    
+    output$active <- renderPlot(
+        ggplot() + 
+            geom_polygon(data = map_data("world"), 
+                         aes(x = long, y = lat, group = group), 
+                         fill = "grey", alpha = 0.5) + 
+            theme_void() + 
+            coord_map()
+    )
 }
 
 # Run the application 

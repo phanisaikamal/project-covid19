@@ -13,8 +13,6 @@ library(DT)
 library(maps)
 library(mapproj)
 
-rm(list = ls())
-
 get_data <- function(){
     confirmed.cases <- read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv")
     confirmed.cases <- confirmed.cases[, c(1:4, ncol(confirmed.cases))]

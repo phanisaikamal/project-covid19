@@ -12,6 +12,8 @@ library(tidyverse)
 library(DT)
 library(maps)
 library(mapproj)
+library(leaflet)
+library(shinydashboard)
 
 get_data <- function(){
     confirmed.cases <- read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv")
@@ -31,141 +33,64 @@ get_data <- function(){
 df <- get_data()
 
 # Define UI for application that draws a histogram
-ui <- fluidPage(
+ui <- dashboardPage(
     # Application title
-    titlePanel("COVID-19 Monitor Northeastern University"),
+    dashboardHeader(title = "COVID-19 Monitor Northeastern University"), 
+    
+    dashboardSidebar(disable = TRUE), 
     
     # primary layout 
-    sidebarLayout(
-        sidebarPanel(
-            verticalLayout(
-                h3(textOutput("totalConfirmed")), 
-                dataTableOutput("confirmed")
-            ), 
-            width = 3
+    dashboardBody(
+        fluidRow(
+            valueBoxOutput(width = 3, "confirmedCount"), 
+            valueBoxOutput(width = 3, "recoveredCount"), 
+            valueBoxOutput(width = 3, "deathsCount"), 
+            valueBoxOutput(width = 3, "activeCount")
         ),
-        mainPanel(
-            sidebarLayout(
-                sidebarPanel(
-                    verticalLayout(
-                        verticalLayout(
-                            h3(textOutput("totalDeaths")), 
-                            dataTableOutput("deaths"), 
-                            fluid = TRUE
-                        ), 
-                        verticalLayout(
-                            h3(textOutput("totalRecovered")), 
-                            dataTableOutput("recovered"), 
-                            fluid = TRUE
-                        ),
-                        fluid = TRUE
-                    ), 
-                    width = 4
-                ),
-                mainPanel(
-                    tabsetPanel(
-                        tabPanel(
-                            "Global Spread Map", 
-                            tabsetPanel(
-                                tabPanel(
-                                    "Cumulative Confirmed Cases", 
-                                    plotOutput("cumulativeConfirmed")
-                                ),
-                                tabPanel(
-                                    "Active Cases", 
-                                    plotOutput("active")
-                                )
-                            )
-                        ),
-                        tabPanel(
-                            "Growth Charts", 
-                            tabsetPanel(
-                                tabPanel(
-                                    "Actual Growth", 
-                                    plotOutput("actualGrowth")
-                                ),
-                                tabPanel(
-                                    "Forecasted Growth", 
-                                    plotOutput("forecastGrowth")
-                                )
-                            )
-                        )
-                    ), 
-                    width = 8
-                ),
-                position = c("right")
-            ), 
-            width = 9
-        ),
-        position = c("left", "right")
+        
+        fluidPage(
+            leafletOutput("map")
+        )
     )
 )
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
     
-    output$totalConfirmed <- renderText(
-        paste("Total Confirmed: ", sum(df$Confirmed))
-    ) 
-    
-    output$confirmed <- DT::renderDataTable(
-        df %>% 
-            group_by(Country) %>% 
-            summarise(Total = sum(Confirmed)) %>% 
-            arrange(-Total), 
-        rownames = FALSE, 
-        extensions = c("Scroller"), 
-        options = list(info = FALSE, scroller = TRUE, scrollY = 500, searching = FALSE)
-    ) 
-    
-    output$totalDeaths <- renderText(
-        paste("Total Deaths: ", sum(df$Deaths))
+    output$confirmedCount <- renderValueBox(
+        valueBox(
+            paste(sum(df$Confirmed)), "Confirmed Cases", 
+            color = "red", icon = icon("user-check")
+        )
     )
     
-    output$deaths <- DT::renderDataTable(
-        df %>%  
-            group_by(Country) %>% 
-            summarise(Total = sum(Deaths)) %>% 
-            arrange(-Total), 
-        rownames = FALSE, 
-        extensions = c("Scroller"), 
-        options = list(info = FALSE, scroller = TRUE, scrollY = 200, searching = FALSE)
+    output$recoveredCount <- renderValueBox(
+        valueBox(
+            paste(sum(df$Recovered)), "Recovered Cases", 
+            color = "green", icon = icon("user-shield")
+        )
     )
     
-    output$totalRecovered <- renderText(
-        paste("Total Recovered: ", sum(df$Recovered))
+    output$deathsCount <- renderValueBox(
+        valueBox(
+            paste(sum(df$Deaths)), "Death Cases", 
+            color = "purple", icon = icon("user-slash")
+        )
     )
     
-    output$recovered <- DT::renderDataTable(
-        df %>% 
-            group_by(Country) %>% 
-            summarise(Total = sum(Recovered)) %>% 
-            arrange(-Total), 
-        rownames = FALSE, 
-        extensions = c("Scroller"), 
-        options = list(info = FALSE, scroller = TRUE, scrollY = 200, searching = FALSE)
+    output$activeCount <- renderValueBox(
+        valueBox(
+            paste(sum(df$Active)), "Active Cases", 
+            color = "yellow", icon = icon("user-clock")
+        )
     )
     
-    output$cumulativeConfirmed <- renderPlot(
-        ggplot() + 
-            geom_polygon(data = map_data("world"), 
-                         aes(x = long, y = lat, group = group), 
-                         fill = "grey", alpha = 0.8) + 
-            geom_point(data = df, 
-                       aes(x = Long, y = Lat, size = Confirmed), color = "red", alpha = 0.3) + 
-            theme_void() +  
-            scale_size_binned(breaks = c(10, 100, 1000, 5000, 10000, 25000, 50000))
-    )
-    
-    output$active <- renderPlot(
-        ggplot() + 
-            geom_polygon(data = map_data("world"), 
-                         aes(x = long, y = lat, group = group), 
-                         fill = "grey", alpha = 0.8) + 
-            geom_point(data = df, 
-                       aes(x = Long, y = Lat, size = Active), color = "orange", alpha = 0.3) + 
-            theme_void() +  
-            scale_size_binned(breaks = c(10, 100, 1000, 5000, 10000, 25000, 50000))
+    output$map <- renderLeaflet(
+        leaflet(df) %>% 
+            addTiles() %>% 
+            addCircles(lng = ~Long, lat = ~Lat, weight = 1, 
+                       radius = ~Confirmed*15, popup = ~State, 
+                       fillOpacity = 0.3, color = "red")
     )
 }
 

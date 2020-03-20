@@ -155,7 +155,8 @@ server <- function(input, output) {
                        aes(x = Long, y = Lat, size = Confirmed), color = "red", alpha = 0.3) + 
             theme_void() + 
             theme(legend.position = "bottom") + 
-            coord_cartesian(ylim = c(-60, 80)) 
+            coord_cartesian(ylim = c(-60, 80)) + 
+            scale_size_binned(breaks = c(10, 100, 1000, 5000, 10000, 25000, 50000))
     )
     
     output$active <- renderPlot(

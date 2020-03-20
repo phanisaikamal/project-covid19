@@ -26,6 +26,7 @@ get_data <- function(){
         inner_join(recovered.cases, by = names(confirmed.cases[, 1:4])) %>%
         inner_join(deaths.cases, by = names(confirmed.cases[, 1:4]))
     names(all.cases) <- c("State", "Country", "Lat", "Long", "Confirmed", "Recovered", "Deaths")
+    all.cases <- mutate(all.cases, Active = Confirmed - Recovered - Deaths)
     return(all.cases)
 }
 
@@ -163,8 +164,12 @@ server <- function(input, output) {
         ggplot() + 
             geom_polygon(data = map_data("world"), 
                          aes(x = long, y = lat, group = group), 
-                         fill = "grey", alpha = 0.5) +  
-            theme_void()
+                         fill = "grey", alpha = 0.5) + 
+            geom_point(data = df, 
+                       aes(x = Long, y = Lat, size = Active), color = "orange", alpha = 0.3) + 
+            theme_void() + 
+            theme(legend.position = "bottom") + 
+            coord_cartesian(ylim = c(-60, 80)) 
     )
 }
 

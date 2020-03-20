@@ -153,8 +153,7 @@ server <- function(input, output) {
                          fill = "grey", alpha = 0.8) + 
             geom_point(data = df, 
                        aes(x = Long, y = Lat, size = Confirmed), color = "red", alpha = 0.3) + 
-            theme_void() + 
-            theme(legend.position = "bottom") + 
+            theme_void() +  
             scale_size_binned(breaks = c(10, 100, 1000, 5000, 10000, 25000, 50000))
     )
     

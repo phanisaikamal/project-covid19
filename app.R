@@ -9,12 +9,27 @@
 
 library(shiny)
 library(tidyverse)
-library(coronavirus)
 library(DT)
 library(maps)
 library(mapproj)
 
-df <- as.data.frame(coronavirus)
+rm(list = ls())
+
+get_data <- function(){
+    confirmed.cases <- read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv")
+    confirmed.cases <- confirmed.cases[, c(1:4, ncol(confirmed.cases))]
+    recovered.cases <- read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Recovered.csv")
+    recovered.cases <- recovered.cases[, c(1:4, ncol(recovered.cases))]
+    deaths.cases <- read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Deaths.csv")
+    deaths.cases <- deaths.cases[, c(1:4, ncol(deaths.cases))]
+    all.cases <- confirmed.cases %>% 
+        inner_join(recovered.cases, by = names(confirmed.cases[, 1:4])) %>%
+        inner_join(deaths.cases, by = names(confirmed.cases[, 1:4]))
+    names(all.cases) <- c("State", "Country", "Lat", "Long", "Confirmed", "Recovered", "Deaths")
+    return(all.cases)
+}
+
+df <- get_data()
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
@@ -91,18 +106,13 @@ ui <- fluidPage(
 server <- function(input, output) {
     
     output$totalConfirmed <- renderText(
-        paste("Total Confimed: ", 
-                  df %>% 
-                      filter(type == "confirmed") %>% 
-                      summarise(sum(cases))
-        )
+        paste("Total Confirmed: ", sum(df$Confirmed))
     ) 
     
     output$confirmed <- DT::renderDataTable(
         df %>% 
-            filter(type == "confirmed") %>% 
-            group_by(Country = Country.Region) %>% 
-            summarise(Total = sum(cases)) %>% 
+            group_by(Country) %>% 
+            summarise(Total = sum(Confirmed)) %>% 
             arrange(-Total), 
         rownames = FALSE, 
         extensions = c("Scroller"), 
@@ -110,18 +120,13 @@ server <- function(input, output) {
     ) 
     
     output$totalDeaths <- renderText(
-        paste("Total Deaths: ", 
-              df %>% 
-                  filter(type == "death") %>% 
-                  summarise(sum(cases))
-        )
+        paste("Total Deaths: ", sum(df$Deaths))
     )
     
     output$deaths <- DT::renderDataTable(
-        df %>% 
-            filter(type == "death") %>% 
-            group_by(Country = Country.Region) %>% 
-            summarise(Total = sum(cases)) %>% 
+        df %>%  
+            group_by(Country) %>% 
+            summarise(Total = sum(Deaths)) %>% 
             arrange(-Total), 
         rownames = FALSE, 
         extensions = c("Scroller"), 
@@ -129,18 +134,13 @@ server <- function(input, output) {
     )
     
     output$totalRecovered <- renderText(
-        paste("Total Recovered: ", 
-              df %>% 
-                  filter(type == "recovered") %>% 
-                  summarise(sum(cases))
-        )
+        paste("Total Recovered: ", sum(df$Recovered))
     )
     
     output$recovered <- DT::renderDataTable(
         df %>% 
-            filter(type == "recovered") %>% 
-            group_by(Country = Country.Region) %>% 
-            summarise(Total = sum(cases)) %>% 
+            group_by(Country) %>% 
+            summarise(Total = sum(Recovered)) %>% 
             arrange(-Total), 
         rownames = FALSE, 
         extensions = c("Scroller"), 
@@ -152,8 +152,8 @@ server <- function(input, output) {
             geom_polygon(data = map_data("world"), 
                          aes(x = long, y = lat, group = group), 
                          fill = "grey", alpha = 0.5) + 
-            geom_point(data = df %>% filter(type == "confirmed"), 
-                       aes(x = Long, y = Lat, size = cases), color = "red", alpha = 0.3) + 
+            geom_point(data = df, 
+                       aes(x = Long, y = Lat, size = Confirmed), color = "red", alpha = 0.3) + 
             theme_void() + 
             theme(legend.position = "bottom") + 
             coord_cartesian(ylim = c(-60, 80)) 

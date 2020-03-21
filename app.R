@@ -35,7 +35,8 @@ df <- get_data()
 # Define UI for application that draws a histogram
 ui <- dashboardPage(
     # Application title
-    dashboardHeader(title = "COVID-19 Monitor Northeastern University"), 
+    dashboardHeader(title = "COVID-19 Monitor Northeastern University", 
+                    titleWidth = 450), 
     
     dashboardSidebar(disable = TRUE), 
     
@@ -48,8 +49,41 @@ ui <- dashboardPage(
             valueBoxOutput(width = 3, "activeCount")
         ),
         
-        fluidPage(
-            leafletOutput("map")
+        fluidRow(
+            column(
+                width = 2, 
+                box(
+                    title = "Confirmed Cases", width = NULL, 
+                    solidHeader = TRUE, background = "red", 
+                    dataTableOutput("confirmedTable")
+                )
+            ), 
+            
+            column(
+                width = 8, 
+                tabBox(
+                    side = "right", width = "100%", 
+                    selected = "Confirmed Cases", 
+                    tabPanel("Active Cases", leafletOutput("activeMap")), 
+                    tabPanel("Death Cases", leafletOutput("deathsMap")), 
+                    tabPanel("Recovered Cases", leafletOutput("recoveredMap")), 
+                    tabPanel("Confirmed Cases", leafletOutput("confirmedMap"))
+                ) 
+            ), 
+            
+            column(
+                width = 2, 
+                box(
+                    title = "Recovered Cases", width = NULL, 
+                    solidHeader = TRUE, background = "green", 
+                    dataTableOutput("recoveredTable")
+                ), 
+                box(
+                    title = "Death Cases", width = NULL, 
+                    solidHeader = TRUE, background = "purple", 
+                    dataTableOutput("deathsTable")
+                )
+            )
         )
     )
 )
@@ -59,38 +93,120 @@ server <- function(input, output) {
     
     output$confirmedCount <- renderValueBox(
         valueBox(
-            paste(sum(df$Confirmed)), "Confirmed Cases", 
+            paste(sum(df$Confirmed, na.rm = TRUE)), "Confirmed Cases", 
             color = "red", icon = icon("user-check")
         )
     )
     
     output$recoveredCount <- renderValueBox(
         valueBox(
-            paste(sum(df$Recovered)), "Recovered Cases", 
+            paste(sum(df$Recovered, na.rm = TRUE)), "Recovered Cases", 
             color = "green", icon = icon("user-shield")
         )
     )
     
     output$deathsCount <- renderValueBox(
         valueBox(
-            paste(sum(df$Deaths)), "Death Cases", 
+            paste(sum(df$Deaths, na.rm = TRUE)), "Death Cases", 
             color = "purple", icon = icon("user-slash")
         )
     )
     
     output$activeCount <- renderValueBox(
         valueBox(
-            paste(sum(df$Active)), "Active Cases", 
+            paste(sum(df$Active, na.rm = TRUE)), "Active Cases", 
             color = "yellow", icon = icon("user-clock")
         )
     )
     
-    output$map <- renderLeaflet(
+    output$confirmedTable <- DT::renderDataTable(
+        datatable(
+            df %>% 
+                group_by(Country) %>% 
+                summarise(Total = sum(Confirmed, na.rm = TRUE)) %>% 
+                arrange(-Total) %>% 
+                head(10), 
+            rownames = FALSE, 
+            options = list(searching = FALSE, 
+                           paging = FALSE, 
+                           info = FALSE)
+        ) %>% 
+            formatStyle(
+                c('Country', 'Total'), 
+                color = 'black', backgroundColor = NULL, fontWeight = 'bold'
+            )
+    )
+    
+    output$activeMap <- renderLeaflet(
         leaflet(df) %>% 
             addTiles() %>% 
             addCircles(lng = ~Long, lat = ~Lat, weight = 1, 
-                       radius = ~Confirmed*15, popup = ~State, 
-                       fillOpacity = 0.3, color = "red")
+                       radius = ~Active*20, popup = ~State, 
+                       fillOpacity = 0.5, color = "orange") %>% 
+            setView(lng = 0, lat = 0, zoom = 1.5) 
+    )
+    
+    output$deathsMap <- renderLeaflet(
+        leaflet(df) %>% 
+            addTiles() %>% 
+            addCircles(lng = ~Long, lat = ~Lat, weight = 1, 
+                       radius = ~Deaths*20, popup = ~State, 
+                       fillOpacity = 0.5, color = "purple") %>% 
+            setView(lng = 0, lat = 0, zoom = 1.5) 
+    )
+    
+    output$recoveredMap <- renderLeaflet(
+        leaflet(df) %>% 
+            addTiles() %>% 
+            addCircles(lng = ~Long, lat = ~Lat, weight = 1, 
+                       radius = ~Recovered*20, popup = ~State, 
+                       fillOpacity = 0.5, color = "green") %>% 
+            setView(lng = 0, lat = 0, zoom = 1.5) 
+    )
+    
+    output$confirmedMap <- renderLeaflet(
+        leaflet(df) %>% 
+            addTiles() %>% 
+            addCircles(lng = ~Long, lat = ~Lat, weight = 1, 
+                       radius = ~Confirmed*20, popup = ~State, 
+                       fillOpacity = 0.5, color = "red") %>% 
+            setView(lng = 0, lat = 0, zoom = 1.5) 
+    )
+    
+    output$recoveredTable <- DT::renderDataTable(
+        datatable(
+            df %>% 
+                group_by(Country) %>% 
+                summarise(Total = sum(Recovered, na.rm = TRUE)) %>% 
+                arrange(-Total) %>% 
+                head(5), 
+            rownames = FALSE, 
+            options = list(searching = FALSE, 
+                           paging = FALSE, 
+                           info = FALSE)
+        ) %>% 
+            formatStyle(
+                c('Country', 'Total'), 
+                color = 'black', backgroundColor = NULL, fontWeight = 'bold'
+            )
+    )
+    
+    output$deathsTable <- DT::renderDataTable(
+        datatable(
+            df %>% 
+                group_by(Country) %>% 
+                summarise(Total = sum(Deaths, na.rm = TRUE)) %>% 
+                arrange(-Total) %>% 
+                head(5), 
+            rownames = FALSE, 
+            options = list(searching = FALSE, 
+                           paging = FALSE, 
+                           info = FALSE)
+        ) %>% 
+            formatStyle(
+                c('Country', 'Total'), 
+                color = 'black', backgroundColor = NULL, fontWeight = 'bold'
+            )
     )
 }
 

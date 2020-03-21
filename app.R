@@ -30,13 +30,13 @@ get_data <- function(){
     return(all.cases)
 }
 
-df <- get_data()
+df <- get_data() %>% 
+    filter(Confirmed > 0)
 
 # Define UI for application that draws a histogram
 ui <- dashboardPage(
     # Application title
-    dashboardHeader(title = "COVID-19 Monitor Northeastern University", 
-                    titleWidth = 450), 
+    dashboardHeader(title = "COVID-19 Monitor"), 
     
     dashboardSidebar(disable = TRUE), 
     
@@ -165,10 +165,13 @@ server <- function(input, output) {
     )
     
     output$confirmedMap <- renderLeaflet(
-        leaflet(df) %>% 
+        leaflet(df) %>%  
             addTiles() %>% 
             addCircles(lng = ~Long, lat = ~Lat, weight = 1, 
-                       radius = ~Confirmed*20, popup = ~State, 
+                       radius = ~Confirmed*50, label = ~as.character(paste(if(is_empty(df$State) != TRUE){df$State}, 
+                                                                           df$Country, "-", 
+                                                                           "Confirmed: ", Confirmed)), 
+                       labelOptions = labelOptions(noHide = FALSE), 
                        fillOpacity = 0.5, color = "red") %>% 
             setView(lng = 0, lat = 0, zoom = 1.5) 
     )

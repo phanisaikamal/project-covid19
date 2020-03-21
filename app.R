@@ -53,7 +53,7 @@ ui <- dashboardPage(
             column(
                 width = 2, 
                 box(
-                    title = "Confirmed Cases", width = NULL, 
+                    width = NULL, 
                     solidHeader = TRUE, background = "red", 
                     dataTableOutput("confirmedTable")
                 )
@@ -74,12 +74,12 @@ ui <- dashboardPage(
             column(
                 width = 2, 
                 box(
-                    title = "Recovered Cases", width = NULL, 
+                    width = NULL, 
                     solidHeader = TRUE, background = "green", 
                     dataTableOutput("recoveredTable")
                 ), 
                 box(
-                    title = "Death Cases", width = NULL, 
+                    width = NULL, 
                     solidHeader = TRUE, background = "purple", 
                     dataTableOutput("deathsTable")
                 )

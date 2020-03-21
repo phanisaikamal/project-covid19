@@ -138,7 +138,7 @@ server <- function(input, output) {
     )
     
     output$activeMap <- renderLeaflet(
-        leaflet(df) %>% 
+        leaflet(df, options = leafletOptions(minZoom = 1, maxZoom = 18)) %>% 
             addTiles() %>% 
             addCircles(lng = ~Long, lat = ~Lat, weight = 1, 
                        radius = ~Active*20, popup = ~State, 
@@ -147,7 +147,7 @@ server <- function(input, output) {
     )
     
     output$deathsMap <- renderLeaflet(
-        leaflet(df) %>% 
+        leaflet(df, options = leafletOptions(minZoom = 1, maxZoom = 18)) %>% 
             addTiles() %>% 
             addCircles(lng = ~Long, lat = ~Lat, weight = 1, 
                        radius = ~Deaths*20, popup = ~State, 
@@ -156,7 +156,7 @@ server <- function(input, output) {
     )
     
     output$recoveredMap <- renderLeaflet(
-        leaflet(df) %>% 
+        leaflet(df,  options = leafletOptions(minZoom = 1, maxZoom = 18)) %>% 
             addTiles() %>% 
             addCircles(lng = ~Long, lat = ~Lat, weight = 1, 
                        radius = ~Recovered*20, popup = ~State, 
@@ -165,7 +165,7 @@ server <- function(input, output) {
     )
     
     output$confirmedMap <- renderLeaflet(
-        leaflet(df) %>%  
+        leaflet(df,  options = leafletOptions(minZoom = 1, maxZoom = 18)) %>%  
             addTiles() %>% 
             addCircles(lng = ~Long, lat = ~Lat, weight = 1, 
                        radius = ~Confirmed*50, label = ~as.character(paste(if(is_empty(df$State) != TRUE){df$State}, 

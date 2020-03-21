@@ -30,9 +30,6 @@ get_data <- function(){
     return(all.cases)
 }
 
-df <- get_data() %>% 
-    filter(Confirmed > 0)
-
 # Define UI for application that draws a histogram
 ui <- dashboardPage(
     # Application title
@@ -90,6 +87,9 @@ ui <- dashboardPage(
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
+    
+    df <- get_data() %>% 
+        filter(Confirmed > 0)
     
     output$confirmedCount <- renderValueBox(
         valueBox(
@@ -156,7 +156,7 @@ server <- function(input, output) {
     )
     
     output$recoveredMap <- renderLeaflet(
-        leaflet(df,  options = leafletOptions(minZoom = 1, maxZoom = 18)) %>% 
+        leaflet(df, options = leafletOptions(minZoom = 1, maxZoom = 18)) %>% 
             addTiles() %>% 
             addCircles(lng = ~Long, lat = ~Lat, weight = 1, 
                        radius = ~Recovered*20, popup = ~State, 
@@ -165,10 +165,10 @@ server <- function(input, output) {
     )
     
     output$confirmedMap <- renderLeaflet(
-        leaflet(df,  options = leafletOptions(minZoom = 1, maxZoom = 18)) %>%  
+        leaflet(df, options = leafletOptions(minZoom = 1, maxZoom = 18)) %>%  
             addTiles() %>% 
             addCircles(lng = ~Long, lat = ~Lat, weight = 1, 
-                       radius = ~Confirmed*50, label = ~as.character(paste(if(is_empty(df$State) != TRUE){df$State}, 
+                       radius = ~Confirmed*20, label = ~as.character(paste(if(is_empty(df$State) != TRUE){df$State}, 
                                                                            df$Country, "-", 
                                                                            "Confirmed: ", Confirmed)), 
                        labelOptions = labelOptions(noHide = FALSE), 

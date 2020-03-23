@@ -88,7 +88,8 @@ ui <- dashboardPage(
 # Define server logic required to draw a histogram
 server <- function(input, output) {
     
-    df <- get_data()
+    df <- get_data() %>% 
+        filter(Confirmed > 0)
     
     output$confirmedCount <- renderValueBox(
         valueBox(

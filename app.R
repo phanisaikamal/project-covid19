@@ -188,7 +188,7 @@ server <- function(input, output) {
         datatable(
             df %>% 
                 group_by(Country) %>% 
-                summarise(Total = sum(Recovered, na.rm = TRUE)) %>% 
+                summarise(Total = sum(Recovered)) %>% 
                 arrange(-Total) %>% 
                 head(5), 
             rownames = FALSE, 
@@ -206,7 +206,7 @@ server <- function(input, output) {
         datatable(
             df %>% 
                 group_by(Country) %>% 
-                summarise(Total = sum(Deaths, na.rm = TRUE)) %>% 
+                summarise(Total = sum(Deaths)) %>% 
                 arrange(-Total) %>% 
                 head(5), 
             rownames = FALSE, 

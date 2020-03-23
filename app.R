@@ -141,8 +141,8 @@ server <- function(input, output) {
         leaflet(df, options = leafletOptions(minZoom = 1, maxZoom = 6)) %>% 
             addTiles() %>% 
             addCircles(lng = ~Long, lat = ~Lat, weight = 1, 
-                       radius = ~Active*20, label = ~as.character(gsub("NA", "", 
-                                                                       paste(State, 
+                       radius = ~Active*20, label = ~as.character(gsub("NA ,", "", 
+                                                                       paste(State, ",", 
                                                                              Country, "-", 
                                                                              "Active: ", Active))), 
                        labelOptions = labelOptions(noHide = FALSE), 
@@ -154,8 +154,8 @@ server <- function(input, output) {
         leaflet(df, options = leafletOptions(minZoom = 1, maxZoom = 6)) %>% 
             addTiles() %>% 
             addCircles(lng = ~Long, lat = ~Lat, weight = 1, 
-                       radius = ~Deaths*20, label = ~as.character(gsub("NA", "", 
-                                                                       paste(State, 
+                       radius = ~Deaths*20, label = ~as.character(gsub("NA ,", "", 
+                                                                       paste(State, ",", 
                                                                              Country, "-", 
                                                                              "Deaths: ", Deaths))), 
                        labelOptions = labelOptions(noHide = FALSE), 
@@ -167,8 +167,8 @@ server <- function(input, output) {
         leaflet(df, options = leafletOptions(minZoom = 1, maxZoom = 6)) %>% 
             addTiles() %>% 
             addCircles(lng = ~Long, lat = ~Lat, weight = 1, 
-                       radius = ~Recovered*20, label = ~as.character(gsub("NA", "", 
-                                                                          paste(State, 
+                       radius = ~Recovered*20, label = ~as.character(gsub("NA ,", "", 
+                                                                          paste(State, ",", 
                                                                                 Country, "-", 
                                                                                 "Recovered: ", Recovered))), 
                        labelOptions = labelOptions(noHide = FALSE), 
@@ -180,8 +180,8 @@ server <- function(input, output) {
         leaflet(df, options = leafletOptions(minZoom = 1, maxZoom = 6)) %>%  
             addTiles() %>% 
             addCircles(lng = ~Long, lat = ~Lat, weight = 1, 
-                       radius = ~Confirmed*20, label = ~as.character(gsub("NA", "", 
-                                                                          paste(State, 
+                       radius = ~Confirmed*20, label = ~as.character(gsub("NA ,", "", 
+                                                                          paste(State, ",", 
                                                                                 Country, "-", 
                                                                                 "Confirmed: ", Confirmed))), 
                        labelOptions = labelOptions(noHide = FALSE), 

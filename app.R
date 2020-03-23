@@ -138,48 +138,52 @@ server <- function(input, output) {
     )
     
     output$activeMap <- renderLeaflet(
-        leaflet(df, options = leafletOptions(minZoom = 1, maxZoom = 18)) %>% 
+        leaflet(df, options = leafletOptions(minZoom = 1, maxZoom = 6)) %>% 
             addTiles() %>% 
             addCircles(lng = ~Long, lat = ~Lat, weight = 1, 
-                       radius = ~Active*20, label = ~as.character(paste(if(is_empty(df$State) != TRUE){df$State}, 
-                                                                                 df$Country, "-", 
-                                                                                 "Active: ", Active)), 
+                       radius = ~Active*20, label = ~as.character(gsub("NA", "", 
+                                                                       paste(State, 
+                                                                             Country, "-", 
+                                                                             "Active: ", Active))), 
                        labelOptions = labelOptions(noHide = FALSE), 
                        fillOpacity = 0.5, color = "orange") %>% 
             setView(lng = 0, lat = 0, zoom = 1.5) 
     )
     
     output$deathsMap <- renderLeaflet(
-        leaflet(df, options = leafletOptions(minZoom = 1, maxZoom = 18)) %>% 
+        leaflet(df, options = leafletOptions(minZoom = 1, maxZoom = 6)) %>% 
             addTiles() %>% 
             addCircles(lng = ~Long, lat = ~Lat, weight = 1, 
-                       radius = ~Deaths*20, label = ~as.character(paste(if(is_empty(df$State) != TRUE){df$State}, 
-                                                                                 df$Country, "-", 
-                                                                                 "Deaths: ", Deaths)), 
+                       radius = ~Deaths*20, label = ~as.character(gsub("NA", "", 
+                                                                       paste(State, 
+                                                                             Country, "-", 
+                                                                             "Deaths: ", Deaths))), 
                        labelOptions = labelOptions(noHide = FALSE), 
                        fillOpacity = 0.5, color = "purple") %>% 
             setView(lng = 0, lat = 0, zoom = 1.5) 
     )
     
     output$recoveredMap <- renderLeaflet(
-        leaflet(df, options = leafletOptions(minZoom = 1, maxZoom = 18)) %>% 
+        leaflet(df, options = leafletOptions(minZoom = 1, maxZoom = 6)) %>% 
             addTiles() %>% 
             addCircles(lng = ~Long, lat = ~Lat, weight = 1, 
-                       radius = ~Recovered*20, label = ~as.character(paste(if(is_empty(df$State) != TRUE){df$State}, 
-                                                                                    df$Country, "-", 
-                                                                                    "Recovered: ", Recovered)), 
+                       radius = ~Recovered*20, label = ~as.character(gsub("NA", "", 
+                                                                          paste(State, 
+                                                                                Country, "-", 
+                                                                                "Recovered: ", Recovered))), 
                        labelOptions = labelOptions(noHide = FALSE), 
                        fillOpacity = 0.5, color = "green") %>% 
             setView(lng = 0, lat = 0, zoom = 1.5) 
     )
     
     output$confirmedMap <- renderLeaflet(
-        leaflet(df, options = leafletOptions(minZoom = 1, maxZoom = 18)) %>%  
+        leaflet(df, options = leafletOptions(minZoom = 1, maxZoom = 6)) %>%  
             addTiles() %>% 
             addCircles(lng = ~Long, lat = ~Lat, weight = 1, 
-                       radius = ~Confirmed*20, label = ~as.character(paste(if(is_empty(df$State) != TRUE){df$State}, 
-                                                                           df$Country, "-", 
-                                                                           "Confirmed: ", Confirmed)), 
+                       radius = ~Confirmed*20, label = ~as.character(gsub("NA", "", 
+                                                                          paste(State, 
+                                                                                Country, "-", 
+                                                                                "Confirmed: ", Confirmed))), 
                        labelOptions = labelOptions(noHide = FALSE), 
                        fillOpacity = 0.5, color = "red") %>% 
             setView(lng = 0, lat = 0, zoom = 1.5) 

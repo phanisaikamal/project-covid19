@@ -30,6 +30,16 @@ get_data <- function(){
     return(all.cases)
 }
 
+hits <- function(){
+    if(!file.exists("pageHitsCount.Rdata"))
+        counter <- 0
+    else
+        load(file = "pageHitsCount.Rdata")
+    counter <- counter + 1 
+    save(counter, file = "pageHitsCount.Rdata")
+    return(counter)
+}
+
 # Define UI for application that draws a histogram
 ui <- dashboardPage(
     # Application title
@@ -41,9 +51,10 @@ ui <- dashboardPage(
     dashboardBody(
         fluidRow(
             valueBoxOutput(width = 3, "confirmedCount"), 
-            valueBoxOutput(width = 3, "recoveredCount"), 
-            valueBoxOutput(width = 3, "deathsCount"), 
-            valueBoxOutput(width = 3, "activeCount")
+            valueBoxOutput(width = 2, "recoveredCount"), 
+            valueBoxOutput(width = 2, "deathsCount"), 
+            valueBoxOutput(width = 3, "activeCount"), 
+            valueBoxOutput(width = 2, "hitsCount")
         ),
         
         fluidRow(
@@ -116,6 +127,13 @@ server <- function(input, output) {
         valueBox(
             paste(sum(df$Active)), "Active Cases", 
             color = "yellow", icon = icon("user-clock")
+        )
+    )
+    
+    output$hitsCount <- renderValueBox(
+        valueBox(
+            paste(hits()), "Page Hits", 
+            color = "teal", icon = icon("chart-line")
         )
     )
     

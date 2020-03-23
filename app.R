@@ -141,7 +141,9 @@ server <- function(input, output) {
         leaflet(df, options = leafletOptions(minZoom = 1, maxZoom = 18)) %>% 
             addTiles() %>% 
             addCircles(lng = ~Long, lat = ~Lat, weight = 1, 
-                       radius = ~Active*20, popup = ~State, 
+                       radius = ~Active*20, label = ~as.character(paste(if(is_empty(df$State) != TRUE){df$State}, 
+                                                                                 df$Country, "-", 
+                                                                                 "Active: ", Active)), 
                        fillOpacity = 0.5, color = "orange") %>% 
             setView(lng = 0, lat = 0, zoom = 1.5) 
     )
@@ -150,7 +152,9 @@ server <- function(input, output) {
         leaflet(df, options = leafletOptions(minZoom = 1, maxZoom = 18)) %>% 
             addTiles() %>% 
             addCircles(lng = ~Long, lat = ~Lat, weight = 1, 
-                       radius = ~Deaths*20, popup = ~State, 
+                       radius = ~Deaths*20, label = ~as.character(paste(if(is_empty(df$State) != TRUE){df$State}, 
+                                                                                 df$Country, "-", 
+                                                                                 "Deaths: ", Deaths)), 
                        fillOpacity = 0.5, color = "purple") %>% 
             setView(lng = 0, lat = 0, zoom = 1.5) 
     )
@@ -159,7 +163,9 @@ server <- function(input, output) {
         leaflet(df, options = leafletOptions(minZoom = 1, maxZoom = 18)) %>% 
             addTiles() %>% 
             addCircles(lng = ~Long, lat = ~Lat, weight = 1, 
-                       radius = ~Recovered*20, popup = ~State, 
+                       radius = ~Recovered*20, label = ~as.character(paste(if(is_empty(df$State) != TRUE){df$State}, 
+                                                                                    df$Country, "-", 
+                                                                                    "Recovered: ", Recovered)), 
                        fillOpacity = 0.5, color = "green") %>% 
             setView(lng = 0, lat = 0, zoom = 1.5) 
     )

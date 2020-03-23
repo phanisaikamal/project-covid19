@@ -88,33 +88,32 @@ ui <- dashboardPage(
 # Define server logic required to draw a histogram
 server <- function(input, output) {
     
-    df <- get_data() %>% 
-        filter(Confirmed > 0)
+    df <- get_data()
     
     output$confirmedCount <- renderValueBox(
         valueBox(
-            paste(sum(df$Confirmed, na.rm = TRUE)), "Confirmed Cases", 
+            paste(sum(df$Confirmed)), "Confirmed Cases", 
             color = "red", icon = icon("user-check")
         )
     )
     
     output$recoveredCount <- renderValueBox(
         valueBox(
-            paste(sum(df$Recovered, na.rm = TRUE)), "Recovered Cases", 
+            paste(sum(df$Recovered)), "Recovered Cases", 
             color = "green", icon = icon("user-shield")
         )
     )
     
     output$deathsCount <- renderValueBox(
         valueBox(
-            paste(sum(df$Deaths, na.rm = TRUE)), "Death Cases", 
+            paste(sum(df$Deaths)), "Death Cases", 
             color = "purple", icon = icon("user-slash")
         )
     )
     
     output$activeCount <- renderValueBox(
         valueBox(
-            paste(sum(df$Active, na.rm = TRUE)), "Active Cases", 
+            paste(sum(df$Active)), "Active Cases", 
             color = "yellow", icon = icon("user-clock")
         )
     )
@@ -123,7 +122,7 @@ server <- function(input, output) {
         datatable(
             df %>% 
                 group_by(Country) %>% 
-                summarise(Total = sum(Confirmed, na.rm = TRUE)) %>% 
+                summarise(Total = sum(Confirmed)) %>% 
                 arrange(-Total) %>% 
                 head(10), 
             rownames = FALSE, 

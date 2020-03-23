@@ -144,6 +144,7 @@ server <- function(input, output) {
                        radius = ~Active*20, label = ~as.character(paste(if(is_empty(df$State) != TRUE){df$State}, 
                                                                                  df$Country, "-", 
                                                                                  "Active: ", Active)), 
+                       labelOptions = labelOptions(noHide = FALSE), 
                        fillOpacity = 0.5, color = "orange") %>% 
             setView(lng = 0, lat = 0, zoom = 1.5) 
     )
@@ -155,6 +156,7 @@ server <- function(input, output) {
                        radius = ~Deaths*20, label = ~as.character(paste(if(is_empty(df$State) != TRUE){df$State}, 
                                                                                  df$Country, "-", 
                                                                                  "Deaths: ", Deaths)), 
+                       labelOptions = labelOptions(noHide = FALSE), 
                        fillOpacity = 0.5, color = "purple") %>% 
             setView(lng = 0, lat = 0, zoom = 1.5) 
     )
@@ -166,6 +168,7 @@ server <- function(input, output) {
                        radius = ~Recovered*20, label = ~as.character(paste(if(is_empty(df$State) != TRUE){df$State}, 
                                                                                     df$Country, "-", 
                                                                                     "Recovered: ", Recovered)), 
+                       labelOptions = labelOptions(noHide = FALSE), 
                        fillOpacity = 0.5, color = "green") %>% 
             setView(lng = 0, lat = 0, zoom = 1.5) 
     )

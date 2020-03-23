@@ -50,10 +50,10 @@ ui <- dashboardPage(
     # primary layout 
     dashboardBody(
         fluidRow(
-            valueBoxOutput(width = 3, "confirmedCount"), 
+            valueBoxOutput(width = 2, "confirmedCount"), 
             valueBoxOutput(width = 2, "recoveredCount"), 
             valueBoxOutput(width = 2, "deathsCount"), 
-            valueBoxOutput(width = 3, "activeCount"), 
+            valueBoxOutput(width = 2, "activeCount"), 
             valueBoxOutput(width = 2, "hitsCount")
         ),
         

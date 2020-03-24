@@ -45,7 +45,9 @@ ui <- dashboardPage(
     # Application title
     dashboardHeader(title = "COVID-19 Monitor"), 
     
-    dashboardSidebar(), 
+    dashboardSidebar(
+        collapsed = TRUE
+    ), 
     
     # primary layout 
     dashboardBody(

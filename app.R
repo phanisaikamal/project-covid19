@@ -45,52 +45,78 @@ ui <- dashboardPage(
     # Application title
     dashboardHeader(title = "COVID-19 Monitor"), 
     
-    dashboardSidebar(disable = TRUE), 
+    dashboardSidebar(), 
     
     # primary layout 
     dashboardBody(
         fluidRow(
-            valueBoxOutput(width = 2, "confirmedCount"), 
+            valueBoxOutput(width = 3, "confirmedCount"), 
             valueBoxOutput(width = 2, "recoveredCount"), 
             valueBoxOutput(width = 2, "deathsCount"), 
             valueBoxOutput(width = 2, "activeCount"), 
-            valueBoxOutput(width = 2, "hitsCount")
+            valueBoxOutput(width = 3, "hitsCount")
         ),
         
         fluidRow(
-            column(
-                width = 2, 
-                box(
-                    width = NULL, 
-                    solidHeader = TRUE, background = "red", 
-                    dataTableOutput("confirmedTable")
-                )
-            ), 
-            
-            column(
-                width = 8, 
-                tabBox(
-                    side = "right", width = "100%", 
-                    selected = "Confirmed Cases", 
-                    tabPanel("Active Cases", leafletOutput("activeMap")), 
-                    tabPanel("Death Cases", leafletOutput("deathsMap")), 
-                    tabPanel("Recovered Cases", leafletOutput("recoveredMap")), 
-                    tabPanel("Confirmed Cases", leafletOutput("confirmedMap"))
-                ) 
-            ), 
-            
-            column(
-                width = 2, 
-                box(
-                    width = NULL, 
-                    solidHeader = TRUE, background = "green", 
-                    dataTableOutput("recoveredTable")
-                ), 
-                box(
-                    width = NULL, 
-                    solidHeader = TRUE, background = "purple", 
-                    dataTableOutput("deathsTable")
-                )
+            tabBox(
+                side = "right", width = "100%", 
+                selected = "Confirmed Cases", 
+                tabPanel("Active Cases", 
+                         column(
+                             width = 9, 
+                             leafletOutput("activeMap")
+                         ), 
+                         column(
+                             width = 3, 
+                             box(
+                                 width = NULL, 
+                                 solidHeader = TRUE, background = "orange", 
+                                 dataTableOutput("activeTable")
+                             )
+                         )
+                    ), 
+                tabPanel("Death Cases", 
+                         column(
+                             width = 9, 
+                             leafletOutput("deathsMap")
+                         ), 
+                         column(
+                             width = 3, 
+                             box(
+                                 width = NULL, 
+                                 solidHeader = TRUE, background = "purple", 
+                                 dataTableOutput("deathsTable")
+                             )
+                         )
+                    ), 
+                tabPanel("Recovered Cases", 
+                         column(
+                             width = 9, 
+                             leafletOutput("recoveredMap")
+                         ), 
+                         column(
+                             width = 3, 
+                             box(
+                                 width = NULL, 
+                                 solidHeader = TRUE, background = "green", 
+                                 dataTableOutput("recoveredTable")
+                             )
+                         )
+                    ), 
+                tabPanel("Confirmed Cases", 
+                         column(
+                             width = 9, 
+                             leafletOutput("confirmedMap")
+                         ), 
+                         column(
+                             width = 3, 
+                             box(
+                                 width = NULL, 
+                                 solidHeader = TRUE, background = "red", 
+                                 dataTableOutput("confirmedTable")
+                             )
+                         )
+                    )
             )
         )
     )
@@ -126,33 +152,15 @@ server <- function(input, output) {
     output$activeCount <- renderValueBox(
         valueBox(
             paste(sum(df$Active)), "Active Cases", 
-            color = "yellow", icon = icon("user-clock")
+            color = "orange", icon = icon("user-clock")
         )
     )
     
     output$hitsCount <- renderValueBox(
         valueBox(
             paste(hits()), "Page Hits", 
-            color = "teal", icon = icon("chart-line")
+            color = "maroon", icon = icon("chart-line")
         )
-    )
-    
-    output$confirmedTable <- DT::renderDataTable(
-        datatable(
-            df %>% 
-                group_by(Country) %>% 
-                summarise(Total = sum(Confirmed)) %>% 
-                arrange(-Total) %>% 
-                head(10), 
-            rownames = FALSE, 
-            options = list(searching = FALSE, 
-                           paging = FALSE, 
-                           info = FALSE)
-        ) %>% 
-            formatStyle(
-                c('Country', 'Total'), 
-                color = 'black', backgroundColor = NULL, fontWeight = 'bold'
-            )
     )
     
     output$activeMap <- renderLeaflet(
@@ -211,13 +219,13 @@ server <- function(input, output) {
             setMaxBounds(-180, 90, 180, -90) 
     )
     
-    output$recoveredTable <- DT::renderDataTable(
+    output$activeTable <- DT::renderDataTable(
         datatable(
             df %>% 
                 group_by(Country) %>% 
-                summarise(Total = sum(Recovered)) %>% 
+                summarise(Total = sum(Active)) %>% 
                 arrange(-Total) %>% 
-                head(5), 
+                head(10), 
             rownames = FALSE, 
             options = list(searching = FALSE, 
                            paging = FALSE, 
@@ -235,7 +243,43 @@ server <- function(input, output) {
                 group_by(Country) %>% 
                 summarise(Total = sum(Deaths)) %>% 
                 arrange(-Total) %>% 
-                head(5), 
+                head(10), 
+            rownames = FALSE, 
+            options = list(searching = FALSE, 
+                           paging = FALSE, 
+                           info = FALSE)
+        ) %>% 
+            formatStyle(
+                c('Country', 'Total'), 
+                color = 'black', backgroundColor = NULL, fontWeight = 'bold'
+            )
+    )
+    
+    output$recoveredTable <- DT::renderDataTable(
+        datatable(
+            df %>% 
+                group_by(Country) %>% 
+                summarise(Total = sum(Recovered)) %>% 
+                arrange(-Total) %>% 
+                head(10), 
+            rownames = FALSE, 
+            options = list(searching = FALSE, 
+                           paging = FALSE, 
+                           info = FALSE)
+        ) %>% 
+            formatStyle(
+                c('Country', 'Total'), 
+                color = 'black', backgroundColor = NULL, fontWeight = 'bold'
+            )
+    )
+    
+    output$confirmedTable <- DT::renderDataTable(
+        datatable(
+            df %>% 
+                group_by(Country) %>% 
+                summarise(Total = sum(Confirmed)) %>% 
+                arrange(-Total) %>% 
+                head(10), 
             rownames = FALSE, 
             options = list(searching = FALSE, 
                            paging = FALSE, 

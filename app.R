@@ -16,11 +16,11 @@ library(leaflet)
 library(shinydashboard)
 
 get_data <- function(){
-    confirmed.cases <- read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv")
+    confirmed.cases <- read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv")
     confirmed.cases <- confirmed.cases[, c(1:4, ncol(confirmed.cases))]
-    recovered.cases <- read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Recovered.csv")
+    recovered.cases <- read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv")
     recovered.cases <- recovered.cases[, c(1:4, ncol(recovered.cases))]
-    deaths.cases <- read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Deaths.csv")
+    deaths.cases <- read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv")
     deaths.cases <- deaths.cases[, c(1:4, ncol(deaths.cases))]
     all.cases <- confirmed.cases %>% 
         inner_join(recovered.cases, by = names(confirmed.cases[, 1:4])) %>%
@@ -169,12 +169,12 @@ server <- function(input, output) {
         leaflet(df, options = leafletOptions(minZoom = 1, maxZoom = 5)) %>% 
             addTiles() %>% 
             addCircles(lng = ~Long, lat = ~Lat, weight = 1, 
-                       radius = ~Active*20, label = ~as.character(gsub("NA ,", "", 
+                       radius = ~Active*5, label = ~as.character(gsub("NA ,", "", 
                                                                        paste(State, ",", 
                                                                              Country, "-", 
                                                                              "Active: ", Active))), 
                        labelOptions = labelOptions(noHide = FALSE), 
-                       fillOpacity = 0.5, color = "orange") %>% 
+                       fillOpacity = 0.3, color = "orange") %>% 
             setView(lng = 0, lat = 0, zoom = 1.5) %>% 
             setMaxBounds(-180, 90, 180, -90) 
     )
@@ -183,12 +183,12 @@ server <- function(input, output) {
         leaflet(df, options = leafletOptions(minZoom = 1, maxZoom = 5)) %>% 
             addTiles() %>% 
             addCircles(lng = ~Long, lat = ~Lat, weight = 1, 
-                       radius = ~Deaths*20, label = ~as.character(gsub("NA ,", "", 
+                       radius = ~Deaths*5, label = ~as.character(gsub("NA ,", "", 
                                                                        paste(State, ",", 
                                                                              Country, "-", 
                                                                              "Deaths: ", Deaths))), 
                        labelOptions = labelOptions(noHide = FALSE), 
-                       fillOpacity = 0.5, color = "purple") %>% 
+                       fillOpacity = 0.3, color = "purple") %>% 
             setView(lng = 0, lat = 0, zoom = 1.5) %>% 
             setMaxBounds(-180, 90, 180, -90) 
     )
@@ -197,12 +197,12 @@ server <- function(input, output) {
         leaflet(df, options = leafletOptions(minZoom = 1, maxZoom = 5)) %>% 
             addTiles() %>% 
             addCircles(lng = ~Long, lat = ~Lat, weight = 1, 
-                       radius = ~Recovered*20, label = ~as.character(gsub("NA ,", "", 
+                       radius = ~Recovered*5, label = ~as.character(gsub("NA ,", "", 
                                                                           paste(State, ",", 
                                                                                 Country, "-", 
                                                                                 "Recovered: ", Recovered))), 
                        labelOptions = labelOptions(noHide = FALSE), 
-                       fillOpacity = 0.5, color = "green") %>% 
+                       fillOpacity = 0.3, color = "green") %>% 
             setView(lng = 0, lat = 0, zoom = 1.5) %>% 
             setMaxBounds(-180, 90, 180, -90) 
     )
@@ -211,12 +211,12 @@ server <- function(input, output) {
         leaflet(df, options = leafletOptions(minZoom = 1, maxZoom = 5)) %>%  
             addTiles() %>% 
             addCircles(lng = ~Long, lat = ~Lat, weight = 1, 
-                       radius = ~Confirmed*20, label = ~as.character(gsub("NA ,", "", 
+                       radius = ~Confirmed*5, label = ~as.character(gsub("NA ,", "", 
                                                                           paste(State, ",", 
                                                                                 Country, "-", 
                                                                                 "Confirmed: ", Confirmed))), 
                        labelOptions = labelOptions(noHide = FALSE), 
-                       fillOpacity = 0.5, color = "red") %>% 
+                       fillOpacity = 0.3, color = "red") %>% 
             setView(lng = 0, lat = 0, zoom = 1.5) %>% 
             setMaxBounds(-180, 90, 180, -90) 
     )
